@@ -1,2 +1,2 @@
 # Master-thesis
-3D-skeleton action recognition
+Implemnting a federated machine learning scenario using Vantage6 and Brane.
