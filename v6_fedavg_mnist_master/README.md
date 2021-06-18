@@ -11,10 +11,10 @@ This algorithm uses Vantage6 in combination with PyTorch models to build a feder
 
 # required package
 
-Vantage6-client 2.1.0
-PyTorch 1.9.0
-Opacus 0.12.0
-scikit-learn 0.24.2
+Vantage6-client 2.1.0  
+PyTorch 1.9.0  
+Opacus 0.12.0  
+scikit-learn 0.24.2  
 
 # datasets
 train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php)
