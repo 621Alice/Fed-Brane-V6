@@ -1,0 +1,224 @@
+openapi: 3.0.3
+info:
+  title: Vantage6
+  version: 0.1.0
+  description: The Vantage6 API.
+
+servers:
+  - url: http://localhost:5001/api
+
+paths:
+  "/collaboration":
+    get:
+      operationId: getCollaborations
+      responses:
+        "200":
+          description: OK, array of collaborations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Collaboration"
+      security:
+        - bearerAuth: []
+
+  "/token/user":
+    post:
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/User"
+      responses:
+        '200':
+          description: OK, authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - access_token
+                  - refresh_token
+                  - refresh_url
+                  - user_url
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+                  refresh_url:
+                    type: string
+                  user_url:
+                    type: string
+                    
+  "/task":
+    get:
+      operationId: getTasks
+      responses:
+        "200":
+          description: OK, array of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Task"
+      security:
+        - bearerAuth: []
+        
+    post:
+      operationId: createTask
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - description
+                - collaboration_id
+                - image
+                - name
+                - organizations
+              properties:
+                description:
+                  type: string
+                collaboration_id:
+                  type: integer
+                image:
+                  type: string
+                name:
+                  type: string
+                organizations:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/TaskOrganizations"
+                    
+      responses:
+        "200":
+          description: OK, task created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/CreateTaskOutput"
+                
+      security:
+        - bearerAuth: []
+
+  "/task/{id}/result":       
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: task id
+        schema:
+          type: integer
+      operationId: getTaskResult
+      responses:
+        "200":
+          description: OK, array of result
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Result"
+      security:
+        - bearerAuth: []
+    
+components:
+  schemas:
+    TaskOrganizations:
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        input:
+          type: string
+          
+    Collaboration:
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        encrypted:
+          type: boolean
+
+    User:
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+    Task:
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+        description:
+          type: string
+        image: 
+          type: string
+        complete:
+          type: string
+    
+    Result:
+      properties:
+        id: 
+          type: integer
+        input:
+          type: string
+        result:
+          type: string
+        log:
+          type: string
+        organization:
+          type: string
+        task:
+          type: string
+    
+    CollaborationRef:
+      properties:
+        id:
+          type: integer
+    
+    ResultRef:
+      properties:
+        id:
+          type: integer
+          
+    CreateTaskOutput:
+      properties:
+        collaboration:
+          "$ref": "#/components/schemas/CollaborationRef"
+        id:
+          type: integer
+        complete:
+          type: boolean
+        description:
+          type: string
+        image:
+          type: string
+        name:
+          type: string
+        run_id:
+          type: integer
+        results:
+          type: array
+          items:
+            "$ref": "#/components/schemas/ResultRef"
+        
+          
+        
+      
+  securitySchemes:
+    bearerAuth:
+      type: http
+      bearerFormat: JWT
+      scheme: bearer

@@ -1,0 +1,29 @@
+(brane -d repl) (brane build --init branelet api_spec.yml) 
+(brane remove vantage6) (brane inspect vantage6)
+import vantage6;
+
+#login
+let session := login("admin", "password");
+print(session.access_token)
+
+#get task result
+let r := gettaskresult(5, session.access_token);
+r[0].task;
+r[0].result;
+
+#get collaborations
+let c := getcollaborations(session.access_token);
+c[0].name;
+
+#get tasks
+let t := gettasks(session.access_token);
+t[0].name;
+
+#post a task
+let org := [new TaskOrganizations{id := 1, input := " "}];
+let input := new CreateTaskInput{description := "b_task", collaboration_id := 1, image := "v6-average", name := "FedAvg", organizations := org};       
+let task := createtask(input, session.access_token);           
+
+
+
+
