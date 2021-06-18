@@ -16,9 +16,16 @@ PyTorch 1.9.0
 Opacus 0.12.0
 scikit-learn 0.24.2
 
+# datasets
+train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php)
+
 # how to run
 
 pip install -e .
+
+# run inside mock client
+
+if your are using the train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
 
 
 ------------------------------------
