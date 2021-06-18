@@ -1,0 +1,24 @@
+application:
+  api_key: 8fc5737c-b68f-11eb-9ecd-0242ac110002
+  api_path: /api
+  databases:
+    default: /home/leyu/Documents/Brane_vantage6/v6-average-py-master/v6-average-py/local/data.csv
+  encryption:
+    enabled: false
+    private_key: ''
+  logging:
+    backup_count: 5
+    datefmt: '%Y-%m-%d %H:%M:%S'
+    file: myNode.log
+    format: '%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s'
+    level: DEBUG
+    max_size: 1024
+    use_console: true
+  port: '5001'
+  server_url: http://192.168.0.157
+  task_dir: /home/leyu/.local/share/vantage6/node/myNode
+environments:
+  acc: {}
+  dev: {}
+  prod: {}
+  test: {}

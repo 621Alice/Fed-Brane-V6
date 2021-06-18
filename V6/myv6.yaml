@@ -1,0 +1,21 @@
+application: {}
+environments:
+  acc: {}
+  dev: {}
+  prod:
+    allow_drop_all: 'True'
+    api_path: /api
+    description: MyVantage6
+    ip: 0.0.0.0
+    jwt_secret_key: 9f183428-b68e-11eb-816a-505bc29eadc1
+    logging:
+      backup_count: 5
+      datefmt: '%Y-%m-%d %H:%M:%S'
+      file: myv6.log
+      format: '%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s'
+      level: DEBUG
+      max_size: 1024
+      use_console: true
+    port: '5001'
+    uri: sqlite:///default.sqlite
+  test: {}

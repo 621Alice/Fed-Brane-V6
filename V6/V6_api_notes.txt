@@ -1,0 +1,176 @@
+Enter ipython shell: 
+	vserver start --user
+	vserver shell --user
+
+#in ipyton shell, enter the following commands to use the V6 api
+#1.before using any functions assign the rules to user
+#2.login 
+#3.post a task
+#4.retrive the results
+
+
+#1.assign the rules
+# display all available rules
+db.Rule.get()
+
+# display all available roles
+db.Role.get()
+
+# assign the rule directly to the user
+user = db.User.get_by_username("admin")
+rule = db.Rule.get(28)
+user.rules.append(rule)
+user.save()
+
+
+# 2.login
+url = "http://localhost:5001"
+api_path = "/api"
+
+
+username = "admin"
+password = "password"
+
+
+import requests
+import json
+
+json_data = {
+  "username": username,
+  "password": password
+}
+
+# make an http-call to obtain a JWT-token
+response = requests.post(
+  f"{url}{api_path}/token/user", 
+  json=json_data
+)
+
+# extract JWT access token
+data = response.json()
+access_token = data["access_token"]
+refresh_token = data["refresh_token"]
+
+#You only can post tasks to collaborations 
+#in which the organization you are part participates in this collaboration
+
+headers = {'Authorization': 'Bearer ' + access_token}
+
+
+#list all collaborations
+collab_data=requests.get(
+  f"{url}{api_path}/collaboration", 
+  headers=headers
+)
+collab_data.json()
+
+
+#set the encryption of the collaboration you're using to false 
+#if your node config does not have encryption
+col = db.Collaboration.get(1)
+col.encrypted = False
+col_.save()
+
+
+
+
+#3.post a task
+#list all tasks
+task_data=requests.get(
+  f"{url}{api_path}/task", 
+  headers=headers
+)
+task_data.json()
+
+
+task_spec = {
+  "name": "FedAvg",
+  "image": "v6-average",
+  "collaboration_id": 1,
+  "description": "my task",
+  "organizations": [
+      {"id": 1, "input": ""}
+      
+  ]
+}
+
+task = requests.post(
+  f"{url}{api_path}/task", 
+  headers=headers,
+  json=task_spec
+)
+
+
+
+#get result
+
+#obtain results: polling/listen to a websocket channel
+
+#polling
+from time import sleep
+
+task_id = task.json().get("id")
+task = requests.get(
+  f"{url}{api_path}/task/{task_id}", 
+  headers=headers
+)
+
+
+while not task.get("complete"):
+	task = requests.get(
+      f"{url}{api_path}/task/{task_id}",
+  	  headers=headers
+    )
+  sleep(1)
+
+
+# obtain all Results
+db.Result.get()
+
+# obtain only completed results
+[result for result in db.Result.get() if result.complete]
+
+# obtain result by its unique id
+db.Result.get(1)
+
+
+
+
+##the api key for the node
+#add node to server db and get node api to put in node config
+# We'll use a uuid as the API-key
+from uuid import uuid1
+
+# Nodes always belong to an organization *and* a collaboration
+iknl = db.Organization.get_by_name("IKNL")
+collab = iknl.collaborations[0]
+
+node = db.Node(
+    name = f"IKNL Node - Collaboration {collab.name}",
+    organization = iknl,
+    collaboration = collab,
+    api_key = str(uuid1())
+)
+
+# Save the new node to the database
+node.save()
+
+# Print / save the API-key, so it can be put in the node's
+# config file. Keep this key secret!
+print(node.api_key)
+
+
+#or go to server db to see the api key
+db.Node.get()
+
+#get docker container ip address on linux
+#in terminal : docker exec -it [container-id] bash
+#			   ifconfig -a
+
+
+
+###############
+#For running a node
+#vnode start --user
+#vnode attach
+
