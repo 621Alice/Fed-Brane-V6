@@ -19,14 +19,16 @@ scikit-learn 0.24.2
 # datasets
 train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php)
 
-# how to run
+# how to test locally inside the directory
 
 pip install -e .
+python example.py
 
-# run inside mock client
+# how to run with the mock client
 
 if your are using the train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
 
+# how to run with the real clients
 
 ------------------------------------
 > [vantage6](https://vantage6.ai)
