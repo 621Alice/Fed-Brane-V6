@@ -26,7 +26,7 @@ python example.py
 
 # how to run with the mock client
 
-if your are using the >[train_mnist.csv](https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
+if your are using the[train_mnist.csv](https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
 
 # how to run with the real clients
 
