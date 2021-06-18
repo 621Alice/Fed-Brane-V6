@@ -17,16 +17,16 @@ Opacus 0.12.0
 scikit-learn 0.24.2  
 
 # datasets
-train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php)
+> [train_mnist.csv](https://www.python-course.eu/neural_network_mnist.php)
 
 # how to test locally inside the directory
 
-pip install -e .
+pip install -e .  
 python example.py
 
 # how to run with the mock client
 
-if your are using the train_mnist.csv(https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
+if your are using the >[train_mnist.csv](https://www.python-course.eu/neural_network_mnist.php), change the mock_client.py in line 17 to "pandas.read_csv(dataset,header=None)"
 
 # how to run with the real clients
 
