@@ -1,2 +1,10 @@
-# Master-thesis
-Implemnting a federated machine learning scenario using Vantage6 and Brane.
+Implementing a federated machine learning scenario uisng Brane and Vantage6 
+
+#Brane
+
+
+#Vantage6
+
+
+
+#Integration
