@@ -1,4 +1,4 @@
-<h1 align=center> Implementing a federated machine learning scenario uisng Brane and Vantage6 </h1>
+<h2 align=center> Implementing a federated machine learning scenario uisng Brane and Vantage6 </h2>
 
 
 <h3> Vantage6 </h3>
