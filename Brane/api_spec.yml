@@ -127,7 +127,68 @@ paths:
                   "$ref": "#/components/schemas/Result"
       security:
         - bearerAuth: []
-    
+
+  "/user":
+    get:
+      operationId: get_users
+      responses:
+        "200":
+          description: OK, array of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/UserList"
+      security:
+        - bearerAuth: []
+
+    post:
+      operationId: create_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - firstname
+                - lastname
+                - organization
+                - password
+                - rules
+                - username
+              properties:
+                email:
+                  type: string
+                firstname:
+                  type: string
+                lastname:
+                  type: string
+                organization:
+                  type: array
+                  items:
+                    "$ref": "#/components/schemas/UserOrgRef"
+                password:
+                  type: string
+                rules:
+                  type: array
+                  items:
+                    type: integer
+                username:
+                  type: string
+      responses:
+        "201":
+          description: OK, created user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/UserList"
+      security:
+        - bearerAuth: []
+
+
+
 components:
   schemas:
     TaskOrganizations:
@@ -213,9 +274,20 @@ components:
           type: array
           items:
             "$ref": "#/components/schemas/ResultRef"
-        
-          
-        
+
+    UserList:
+      properties:
+        firstname:
+          type: string
+        id:
+          type: integer
+
+
+    UserOrgRef:
+      properties:
+        id:
+          type: integer
+
       
   securitySchemes:
     bearerAuth:
