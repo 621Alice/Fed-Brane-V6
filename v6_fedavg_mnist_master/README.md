@@ -3,26 +3,38 @@
 
 --------------------
 
-# v6-average-py
+<h4> v6-average-py </h4>
 
 This algorithm is based on [documentation](https://docs.vantage6.ai/v/2.0.0/algorithm-development/create-new-algorithm). 
 Vantage6 allowes to execute computations on federated datasets.
 This algorithm uses Vantage6 in combination with PyTorch models to build a federated averaging learning pipeline for the classification of MNIST dataset.
 
-# required package
+<h4> required package </h4>
+<br>
 Vantage6-client 2.1.0
+<br>
 torch 1.9.0
+<br>
 torchvision
+<br>
 pandas
+<br>
 numpy
+<br>
 scikit-learn 0.24.2
+<br>
 
-# how to run on mock client
+<h4> how to run on mock client </h4>
+<br>
 pip install -e .
+<br>
 python example.py
+<br>
 
-# how to run on real client
+<h4> how to run on real client </h4>
+<br>
 docker build -t fedavg-mnist-2 .
+<br>
 python client.py
 
 ------------------------------------
