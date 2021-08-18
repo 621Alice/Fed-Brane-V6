@@ -8,16 +8,14 @@ import torch.nn as nn
 import pandas as pd
 
 import torch.optim as optim
-from opacus import PrivacyEngine
 from vantage6.tools.util import info, warn
 from torchvision import transforms
-import argparse
 from torchvision import datasets, transforms
 from sklearn.model_selection import train_test_split
 from collections import OrderedDict
 import numpy as np
 
-def master(client, data):
+def master(client, data, ids):
     """Combine partials to global model
     """
 
@@ -25,8 +23,10 @@ def master(client, data):
 
     # Collect all organization that participate in this collaboration.
     # These organizations will receive the task to compute the partial.
-    organizations = client.get_organizations_in_my_collaboration()
-    ids = [organization.get("id") for organization in organizations]
+    # organizations = client.get_organizations_in_my_collaboration()
+    # ids = [organization.get("id") for organization in organizations]
+
+
 
     # Determine the device to train on
     use_cuda = torch.cuda.is_available()
@@ -42,10 +42,9 @@ def master(client, data):
             'method': 'train_test',
             'kwargs': {
                 'model': model,
-                'parameters': model.parameters(),
+                'parameters': list(model.parameters()),
                 'device': device,
                 'log_interval': 10,
-                'local_dp': False,  # throws error if true, maybe confilction with opacus version
                 'return_params': True,
                 'epoch': 1,
                 'if_test': False
@@ -91,7 +90,6 @@ def master(client, data):
                 'parameters': averaged_parameters,
                 'device': device,
                 'log_interval': 10,
-                'local_dp': False,
                 'return_params': True,
                 'epoch': 1,
                 'if_test': True
@@ -100,6 +98,16 @@ def master(client, data):
         organization_ids=ids
     )
 
+    info("Waiting for results")
+    task_id = task.get("id")
+    task = client.get_task(task_id)
+    while not task.get("complete"):
+        task = client.get_task(task_id)
+        info("Waiting for results")
+        time.sleep(1)
+
+    info("Obtaining results")
+
     results = client.get_results(task_id=task.get("id"))
     for output in results:
         acc = output["test_accuracy"]
@@ -107,18 +115,19 @@ def master(client, data):
 
 
 
-def RPC_train_test(data, model, parameters, device, log_interval, local_dp, return_params, epoch, if_test):
+def RPC_train_test(data, model, parameters, device, log_interval, return_params, epoch, if_test):
     """Compute the average partial
     """
     train = data
+    print(len(train))
     train_batch_size = 64
     test_batch_size = 64
 
     X = (train.iloc[:,1: ].values).astype('float32')
     Y = train.iloc[:,0].values
     print(X.shape)
-    features_train, features_test, targets_train, targets_test = train_test_split(X, Y, test_size=0.2,
-                                                                                  random_state=42)
+    features_train, features_test, targets_train, targets_test = train_test_split(X, Y, test_size=0.3,
+                                                                                  shuffle=False)
     X_train = torch.from_numpy(features_train/255.0)
     X_test = torch.from_numpy(features_test/255.0)
 
@@ -136,15 +145,32 @@ def RPC_train_test(data, model, parameters, device, log_interval, local_dp, retu
 
     learning_rate = 0.01
 
-    # if local_dp == True:
     # initializing optimizer and scheduler
     optimizer = optim.SGD(parameters, lr=learning_rate, momentum=0.5)
 
-    if local_dp:
-        privacy_engine = PrivacyEngine(model, batch_size=64,
-                                       sample_size=60000, alphas=range(2, 32), noise_multiplier=1.3,
-                                       max_grad_norm=1.0, )
-        privacy_engine.attach(optimizer)
+    model.train()
+    for epoch in range(1, epoch + 1):
+        for batch_idx, (data, target) in enumerate(train_loader):
+            data, target = data.to(device), target.to(device)
+            optimizer.zero_grad()
+
+            batch_size = data.shape[0]
+            # print(batch_size)
+            data = data.reshape(batch_size, 28, 28)
+            data = data.unsqueeze(1)
+            # print(data.shape)
+            # print(data.type())
+            # print(target.type())
+            output = model(data)
+
+            loss = F.nll_loss(output, target)
+            loss.backward()
+            optimizer.step()
+
+            if batch_idx % log_interval == 0:
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(data), len(train_loader.dataset),
+                           100. * batch_idx / len(train_loader), loss.item()))
 
 
     test_accuracy=0
@@ -176,32 +202,9 @@ def RPC_train_test(data, model, parameters, device, log_interval, local_dp, retu
                     100. * correct / len(test_loader.dataset)))
             test_accuracy = 100. * correct / len(test_loader.dataset)
 
-    else:
-        model.train()
-        for epoch in range(1, epoch + 1):
-            for batch_idx, (data, target) in enumerate(train_loader):
-                data, target = data.to(device), target.to(device)
-                optimizer.zero_grad()
 
-                batch_size = data.shape[0]
-                # print(batch_size)
-                data = data.reshape(batch_size, 28, 28)
-                data = data.unsqueeze(1)
-                # print(data.shape)
-                # print(data.type())
-                # print(target.type())
-                output = model(data)
-
-                loss = F.nll_loss(output, target)
-                loss.backward()
-                optimizer.step()
-
-                if batch_idx % log_interval == 0:
-                    print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                        epoch, batch_idx * len(data), len(train_loader.dataset),
-                               100. * batch_idx / len(train_loader), loss.item()))
     if return_params:
-        for parameters in model.parameters():
+        for parameters in list(model.parameters()):
             return {'params': parameters,
                     'model': model,
                     'test_accuracy': test_accuracy}
