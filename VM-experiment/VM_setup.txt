@@ -1,1 +1,128 @@
+#install curl
+sudo apt install curl
 
+#install jq
+sudo apt-get install jq
+
+#install git
+sudo apt-get install git
+
+#install build-essential
+sudo apt-get install build-essential
+
+#instal pip3
+sudo apt install python3-pip
+
+########################
+#install docker on Debian using repository
+sudo apt-get update
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo \
+  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+sudo apt-get install docker-ce=5:20.10.8~3-0~debian-buster docker-ce-cli=5:20.10.8~3-0~debian-buster containerd.io
+sudo docker run hello-world
+
+#use docker without root
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+docker run hello-world
+
+#enable dockeer to run whenever system is rebooted
+sudo systemctl start docker.service
+sudo systemctl enable docker.service
+
+#instal docker compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose --version
+
+########################
+#Install Brane
+
+#install Brane cli
+set -euo pipefail
+
+VERSION=$(\
+    curl -L -s "api.github.com/repos/onnovalkering/brane/tags" \
+  | jq -r '.[0].name' \
+)
+
+curl "github.com/onnovalkering/brane/releases/download/$VERSION/brane-`uname`" \
+     -L -s -o brane
+
+TARGET_DIR="$HOME/.local/bin"
+mkdir -p $TARGET_DIR
+
+chmod +x brane
+mv brane $TARGET_DIR
+
+if [[ ! :$PATH: == *:"$TARGET_DIR":* ]] ; then
+     echo "WARN: Please add '$TARGET_DIR' to \$PATH."
+fi
+
+#use this for adding the dir to path
+export PATH="$HOME/.local/bin:$PATH"
+
+#install Brane instance
+git clone https://github.com/onnovalkering/brane
+cd brane
+cp -iv ./contrib/config/infra-local-vm.yml ./infra.yml
+echo "dummy: secret" >> secrets.yml
+
+#chang the docker-compose-brn.yml to the newest version and run
+sudo make start-instance
+curl http://localhost:8080/health
+
+##########
+#for brane build
+docker buildx create --use
+##copy the files to the VM dir(/home/$USER/brane/examples/vantage6) for building vantage6, v6_server_v6_node,v6_client,input,base64, then do
+brane build --init branelet api_spec.yml
+cd v6_server
+brane build container.yml
+cd ..
+cd v6_node
+brane build container.yml
+cd ..
+cd v6_client
+brane build api_spec.yml
+cd ..
+cd input
+brane build container.yml
+cd ..
+cd base64
+brane build container.yml
+
+
+
+#####################
+#install V6
+pip3 install vantage6
+export PATH="/home/leyu/.local/bin:$PATH"
+mkdir /home/leyu/.config
+
+###########
+## Set up server
+#create a V6 server
+vserver new --user
+
+#import entities(from the V6 documentation https://docs.vantage6.ai/usage/running-the-server/importing-entities)
+vserver import $(realpath ./fixtures.yaml) --user --drop-all
+
+##########
+## set up node
+vnode new --user
+#specify the server url and right api key
+
+docker login
+docker pull
