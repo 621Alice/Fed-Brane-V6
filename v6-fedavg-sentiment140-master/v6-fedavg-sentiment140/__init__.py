@@ -50,10 +50,10 @@ def master(client, data,ids):
                 'parameters': "",
                 'device': device,
                 'return_params': True,
-                'epochs': 5,
+                'epochs': 1,
                 'if_test': False
             }
-        }, organization_ids=[ids]
+        }, organization_ids=ids
     )
 
     info("Waiting for results")
@@ -91,11 +91,11 @@ def master(client, data,ids):
                 'parameters': averaged_parameters,
                 'device': device,
                 'return_params': True,
-                'epochs': 5,
+                'epochs': 1,
                 'if_test': True
             }
         },
-        organization_ids=[ids]
+        organization_ids=ids
     )
 
     info("Waiting for results")
