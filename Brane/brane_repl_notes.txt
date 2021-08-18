@@ -1,29 +1,197 @@
-(brane -d repl) (brane build --init branelet api_spec.yml) 
+After replacing new "brane" in the "/home/.local/bin" folder, do "chmod +x brane" and rebuild all the packages
+
+
+(brane repl)
+
+#for scenario 1: with V6 infrastructure pre-installed
+
+(brane -d repl) (brane build --init branelet api_spec.yml)
 (brane remove vantage6) (brane inspect vantage6)
+(cd /thesis/Brane/base64; brane build container.yml)(base64)
+(cd /thesis/Brane/input; brane build container.yml)(input_conversion)
+
 import vantage6;
+import base64;
+import input_conversion;
 
 #login
 let session := login("admin", "password");
-print(session.access_token)
+print(session.access_token);
 
-#get task result
-let r := gettaskresult(5, session.access_token);
-r[0].task;
-r[0].result;
+
+#get users
+let users := get_users(session.access_token);
+print(users);
+
+#create a user
+let org := [new UserOrgRef{id := 1}];
+let input := new Create_userInput{email := "test5@mail.com", firstname := "test_user5", lastname:=" ", organization := org, password := "password", rules := [1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38], username := "test5"};
+let user := create_user(input, session.access_token);
+
 
 #get collaborations
 let c := getcollaborations(session.access_token);
-c[0].name;
+print(c);
 
 #get tasks
 let t := gettasks(session.access_token);
-t[0].name;
+print(t);
 
-#post a task
-let org := [new TaskOrganizations{id := 1, input := " "}];
-let input := new CreateTaskInput{description := "b_task", collaboration_id := 1, image := "v6-average", name := "FedAvg", organizations := org};       
-let task := createtask(input, session.access_token);           
+#post a task, the user who posts a task needs to be in the same collaboration as the task
+#task_input: property name needs to be in single quotes inside the string
+let task_input := "{'master': 1,'method':'master','kwargs': { 'ids' : [1,2] } }";
+let prepared_task_input := input_func(task_input);
+let org := [new TaskOrganizations{id := 1, input := prepared_task_input}, new TaskOrganizations{id := 1, input := prepared_task_input}];
+let input := new CreateTaskInput{description := "mnist", collaboration_id := 1, image := "621leyu/v6-fedpytorch:mnist-2", name := "mnist-2", organizations := org};
+let task := createtask(input, session.access_token);
+
+#get task result
+let r := gettaskresult(7, session.access_token);
+print(r[0].task);
+let result := r[0].result;
+print(result);
+let decoded_r := decode(result);
+print(decoded_r);
 
 
 
 
+#for scenario 2: deploying V6 node and server using Brane
+V6-server and v6-node exist as docker images that can be run by starting their corresponding container
+
+
+(cd thesis/Brane/V6-server-node-deployment) (cd v6_server)/(cd v6_node)/(cd v6_client) (brane build container.yml) (cd v6_client) (brane build api_spec.yml)
+(brane -d repl --data /home/leyu/Documents/Brane_vantage6/Data)
+(**docker container ls -a ; docker logs <id> (for debugging a node))
+(**docker remove <id>(stop the container after running))
+
+import v6_client;
+import v6_node;
+import v6_server;
+
+#start server and login
+let server := start_server(5002);
+server.waitUntilStarted();
+
+let server_url := "http://" + server.address + ":5002";
+
+
+####start shell in console(start a new tab to do it)
+docker exec -it <container_id> sh        OR    docker exec <name/id> bash
+vserver-local shell --config "/opt/wd/configuration.yml"
+##in the shell change user rules for admin
+url = "http://localhost:5002"
+api_path = "/api"
+
+
+username = "admin"
+password = "password"
+
+
+import requests
+import json
+
+json_data = {
+  "username": username,
+  "password": password
+}
+
+# make an http-call to obtain a JWT-token
+response = requests.post(
+  f"{url}{api_path}/token/user",
+  json=json_data
+)
+
+# extract JWT access token
+data = response.json()
+access_token = data["access_token"]
+refresh_token = data["refresh_token"]
+
+#You only can post tasks to collaborations
+#in which the organization you are part participates in this collaboration
+
+headers = {'Authorization': 'Bearer ' + access_token}
+
+
+u=db.User.get_by_username('admin')
+l=[1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38,41,43,45,47]
+for x in l:
+    r=db.Rule.get(x)
+    u.rules.append(r)
+    u.save()
+
+
+###note: before starting the node, go to shell and set the encryption of your collaboration to be false
+col=db.Collaboration.get(1)
+col.encrypted=False
+col.save()
+
+
+# login with the user that has all the rules needed
+let session := login("admin", "password", server_url);
+let token := session.access_token;
+
+
+#check collab
+let coll := get_collaborations(server_url,token);
+print(coll);
+
+
+##if node(s) not started
+    #check node info and fill in the right api key to start the node
+    let node_i := get_nodes(server_url,token);
+    print(node_i);
+    let node := start_node("9c84c23a-0021-11ec-9fca-505bc29eadc1", "/data/csvs/mnist_train_test_header_1.csv", server.address, 5002);
+    node.waitUntilStarted();
+    let node := start_node("9c89d3d8-0021-11ec-9fca-505bc29eadc1", "/data/csvs/sentiment_train_test_header_1.csv", server.address, 5002);
+    node.waitUntilStarted();
+
+
+#check tasks
+let tasks := gettasks(server_url, token);
+print(tasks);
+
+
+#create task
+import input_conversion;
+let task_input := "{'master': 1, 'method': 'master','kwargs': { 'ids' : [1] } }";
+let prepared_task_input := input_func(task_input);
+let org := [new TaskOrganizations{id := 1, input := prepared_task_input}];
+let input := new CreateTaskInput{description := "task", collaboration_id := 1, image := "fedavg-mnist-5", name := "mnist-5", organizations := org};
+let task := createtask(input, server_url, token);
+
+
+#get result
+import base64;
+let r := gettaskresult(6, server_url, token);
+print(r[0].task);
+let result := r[0].result;
+print(result);
+let decoded_r := decode(result);
+
+
+
+
+
+
+
+##########Fixtures.yml imported, so not necessarily needed
+    #create a user
+    #get users
+    let users := get_users(server_url, token);
+    print(users);
+    #create a user
+    let org := [new UserOrgRef{id := 1}];
+    let input := new Create_userInput{email := "test@mail.com", firstname := "test_user", lastname:=" ", organization := org, password := "password", rules := [1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38], username := "test"};
+    let user := create_user(input, server_url, token);
+
+    #create collab
+    let collaboration := create_collaboration("collab", "1", server_url, token);
+    #create node
+    let node_info := create_node(<collaboration.id>, server_url, token);
+    let node := start_node(node_info.api_key, "/data/data.csv", server.address, 5002);
+
+
+####################
+#when building new brane functions
+"#!/usr/bin/env bash" is needed for python/sh script
