@@ -16,11 +16,32 @@ db.Rule.get()
 # display all available roles
 db.Role.get()
 
-# assign the rule directly to the user
+# assign the rule directly to the user(1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38,41,43,45,47)
 user = db.User.get_by_username("admin")
+user.rules
 rule = db.Rule.get(28)
 user.rules.append(rule)
 user.save()
+OR
+u=db.User.get_by_username('admin')
+l=[1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38,41,43,45,47]
+for x in l:
+    r=db.Rule.get(x)
+    u.rules.append(r)
+    u.save()
+
+
+
+###########
+#for creating a new node without encryption
+#set the encrypion=false in node config yam file
+#disable the encrpytion in the server side
+#set the encryption of the collaboration you're using to false
+#if your node config does not have encryption
+col = db.Collaboration.get(1)
+col.encrypted = False
+col.save()
+
 
 
 # 2.login
@@ -56,25 +77,53 @@ refresh_token = data["refresh_token"]
 
 headers = {'Authorization': 'Bearer ' + access_token}
 
+#list all users
+users = requests.get(
+  f"{url}{api_path}/user",
+  headers=headers
+)
+users.json()
+
+#list collaboration node
+n = requests.get(
+  f"{url}{api_path}/collaboration/{id}/node",
+  headers=headers
+)
+n.json()
+
 
 #list all collaborations
 collab_data=requests.get(
-  f"{url}{api_path}/collaboration", 
+  f"{url}{api_path}/collaboration",
   headers=headers
 )
 collab_data.json()
 
 
-#set the encryption of the collaboration you're using to false 
-#if your node config does not have encryption
-col = db.Collaboration.get(1)
-col.encrypted = False
-col_.save()
 
 
 
+#create a user(unique email and username, no missing parameters for post body)
+user_data={
+  "email": "test3@mail.com",
+  "firstname": "test_user3",
+  "lastname": "",
+  "organization":{
+    "id" : 4,
+  },
+  "password": "password",
+  "rules": [1,3,5,7,9,11,12,13,14,17,19,20,22,24,26,28,30,33,35,38],
+  "username": "test3"
+}
 
-#3.post a task
+usr = requests.post(
+  f"{url}{api_path}/user",
+  headers=headers,
+  json=user_data
+)
+usr.json()
+
+
 #list all tasks
 task_data=requests.get(
   f"{url}{api_path}/task", 
@@ -83,22 +132,174 @@ task_data=requests.get(
 task_data.json()
 
 
+
+
+#3.post a task
+#the user who post the task needs to be in the same collaboration as the ones who run the task
+
+import json
+import base64
+
+#input for modified v6-average-py
+json_data =  {
+  "master": 1,
+  "method":"master",
+  "kwargs": {
+    "column_name": ["age","weight"],
+    "ids" : [1,2]
+  }
+}
+
+
+#iput for original v6-average-py
+json_data =  {
+  "master": 1,
+  "method":"master",
+  "kwargs": {
+    "column_name": "age"
+  }
+}
+
+#input for fedavg-mnist
+json_data =  {
+  "master": 1,
+  "method":"master",
+  "kwargs": {
+    "ids": [1,2]
+  }
+}
+
+#input for fedavg-sentiment
+json_data =  {
+  "master": 1,
+  "method":"master",
+  "kwargs": {
+    "ids": [2]
+  }
+}
+
+
+
+
+json_bytes = json.dumps(json_data).encode()
+data_format_bytes = 'json'.encode()
+serialized_input = data_format_bytes + b'.' + json_bytes
+prepared_input =  base64.b64encode(serialized_input).decode('UTF-8')
+
+#modified v6-average-py
 task_spec = {
   "name": "FedAvg",
   "image": "v6-average",
   "collaboration_id": 1,
   "description": "my task",
   "organizations": [
-      {"id": 1, "input": ""}
+  
+     {
+        "id": 1,
+        "input": prepared_input 
+      },
+      {
+        "id": 2,
+        "input": prepared_input
+      }
       
   ]
 }
+
+#origial v6-average-py
+task_spec = {
+  "name": "FedAvg2",
+  "image": "v6-average-py",
+  "collaboration_id": 1,
+  "description": "my task",
+  "organizations": [
+  
+     {
+        "id": 1, 
+        "input": prepared_input 
+      }
+      
+  ]
+}
+
+#v6-fedavg-mnist
+task_spec = {
+  "name": "fedavg-mnist-2",
+  "image": "fedavg-mnist-2",
+  "collaboration_id": 1,
+  "description": "my task",
+   "organizations": [
+
+     {
+        "id": 1,
+        "input": prepared_input
+      },
+      {
+        "id": 2,
+        "input": prepared_input
+      }
+
+  ]
+}
+
+
+#v6-fedavg-mnist
+task_spec = {
+  "name": "fedavg-mnist-5",
+  "image": "fedavg-mnist-5",
+  "collaboration_id": 1,
+  "description": "my task",
+   "organizations": [
+
+     {
+        "id": 1,
+        "input": prepared_input
+      }
+
+  ]
+}
+task_spec = {
+  "name": "fedavg-mnist-5",
+  "image": "fedavg-mnist-5",
+  "collaboration_id": 1,
+  "description": "my task",
+   "organizations": [
+
+     {
+        "id": 1,
+        "input": prepared_input
+      },
+      {
+        "id": 2,
+        "input": prepared_input
+      }
+
+  ]
+}
+
+#v6-fedavg-sentiment
+task_spec = {
+  "name": "fedavg-sentiment-2",
+  "image": "fedavg-sentiment-2",
+  "collaboration_id": 1,
+  "description": "my task",
+  "organizations": [
+
+      {"id": 2,
+      "input": prepared_input
+      }
+
+  ]
+}
+
+
 
 task = requests.post(
   f"{url}{api_path}/task", 
   headers=headers,
   json=task_spec
 )
+task.json()
 
 
 
@@ -127,11 +328,27 @@ while not task.get("complete"):
 # obtain all Results
 db.Result.get()
 
+#decode results
+r = requests.get(
+    f"{url}{api_path}/result/{result_id}",
+  	  headers=headers
+    )
+
+s = r.json()['result']
+import base64
+d = base64.b64decode(s)
+import pickle
+pickle.loads(d)
+
+
+
+
 # obtain only completed results
 [result for result in db.Result.get() if result.complete]
 
 # obtain result by its unique id
 db.Result.get(1)
+
 
 
 
@@ -163,7 +380,13 @@ print(node.api_key)
 #or go to server db to see the api key
 db.Node.get()
 
-#get docker container ip address on linux
+#check organization id and corresponding nodes and tasks
+db.Organization.get(1)
+db.Organization.get_by_name("IKNL").nodes
+db.Organization.get_by_name("IKNL").created_tasks
+db.Collaboration.get(1)
+
+#get docker container ip address on manjaro-linux
 #in terminal : docker exec -it [container-id] bash
 #			   ifconfig -a
 
@@ -171,6 +394,18 @@ db.Node.get()
 
 ###############
 #For running a node
-#vnode start --user
-#vnode attach
+vnode start --user
+vnode attach
+
+
+###############
+#remove docker image
+docker rmi <image-id> -f
+
+#check docker container
+docker container ls
+
+#stop a container
+docker stop <container-id>
+
 
