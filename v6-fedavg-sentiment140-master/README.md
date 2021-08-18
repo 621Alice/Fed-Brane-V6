@@ -3,7 +3,7 @@
 
 --------------------
 
-<h4> v6-average-py <h4>
+<h4> v6-average-py </h4>
 
 This algorithm is based on [documentation](https://docs.vantage6.ai/v/2.0.0/algorithm-development/create-new-algorithm). 
 Vantage6 allowes to execute computations on federated datasets.
