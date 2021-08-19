@@ -12,12 +12,18 @@ master_task = client.create_new_task(
                 "master": 1,
                 "method":"master",
                 'kwargs': {
-                    'ids':[0,1],
+                    'ids':[0],
                     'epoch_per_round':1
                 }
 
 
-    }, organization_ids=[0])
+    }, organization_ids=[0,1])
 
 results = client.get_results(master_task.get("id"))
 print(results)
+r = 0
+for result in results:
+    print(result)
+    r =r + result
+
+print('averaging result: ', r/len(results))

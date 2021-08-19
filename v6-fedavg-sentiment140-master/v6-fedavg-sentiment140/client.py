@@ -16,21 +16,21 @@ input_ = {
         "master": "true",
         "method": "master",
         "kwargs":{
-            'ids':[1,2],
+            'ids':[1],
             'epoch_per_round':1
         }
         }
 # # 3. post the task to the server post_task
 task = client.post_task(
-    name="sentiment-2",
-    image="sentiment",
+    name="sentiment",
+    image="621leyu/v6-fedpytorch:sentiment",
     collaboration_id=1,
-    organization_ids=[1],  
+    organization_ids=[1,2],
     input_=input_
 )
 
 # # 4. poll if central container is finished
-task_id = task.get("id") 
+task_id = task.get("id")
 print(f"task id={task_id}")
 
 task = client.request(f"task/{task_id}")
@@ -43,6 +43,10 @@ while not task.get("complete"):
 results = client.get_results(task_id=task.get("id"))
 
 # e.g. print the results per node
+r = 0
 for result in results:
     print("-"*80)
     print(pickle.loads(result.get("result")))
+    r =r + pickle.loads(result.get("result"))
+
+print('averaging result: ', r/len(results))
