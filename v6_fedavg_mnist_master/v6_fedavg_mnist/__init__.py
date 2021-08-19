@@ -15,7 +15,7 @@ from sklearn.model_selection import train_test_split
 from collections import OrderedDict
 import numpy as np
 
-def master(client, data, ids):
+def master(client, data, ids, epoch_per_round):
     """Combine partials to global model
     """
 
@@ -46,7 +46,7 @@ def master(client, data, ids):
                 'device': device,
                 'log_interval': 10,
                 'return_params': True,
-                'epoch': 1,
+                'epoch': epoch_per_round,
                 'if_test': False
             }
         }, organization_ids=ids
@@ -91,7 +91,7 @@ def master(client, data, ids):
                 'device': device,
                 'log_interval': 10,
                 'return_params': True,
-                'epoch': 1,
+                'epoch': epoch_per_round,
                 'if_test': True
             }
         },
