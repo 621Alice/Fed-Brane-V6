@@ -46,7 +46,7 @@ let input := new CreateTaskInput{description := "mnist", collaboration_id := 1, 
 let task := createtask(input, session.access_token);
 
 #get task result
-let r := gettaskresult(7, session.access_token);
+let r := gettaskresult(<id>, session.access_token);
 print(r[0].task);
 let result := r[0].result;
 print(result);
@@ -163,7 +163,7 @@ let task := createtask(input, server_url, token);
 
 #get result
 import base64;
-let r := gettaskresult(6, server_url, token);
+let r := gettaskresult(<id>, server_url, token);
 print(r[0].task);
 let result := r[0].result;
 print(result);
