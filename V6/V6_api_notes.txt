@@ -151,7 +151,7 @@ json_data =  {
 }
 
 
-#iput for original v6-average-py
+#input for original v6-average-py
 json_data =  {
   "master": 1,
   "method":"master",
@@ -165,7 +165,8 @@ json_data =  {
   "master": 1,
   "method":"master",
   "kwargs": {
-    "ids": [1,2]
+    "ids": [1,2],
+    "epoch_per_round":1
   }
 }
 
@@ -174,7 +175,8 @@ json_data =  {
   "master": 1,
   "method":"master",
   "kwargs": {
-    "ids": [2]
+    "ids": [1,2],
+    "epoch_per_round":1
   }
 }
 
@@ -197,18 +199,13 @@ task_spec = {
      {
         "id": 1,
         "input": prepared_input 
-      },
-      {
-        "id": 2,
-        "input": prepared_input
       }
-      
   ]
 }
 
 #origial v6-average-py
 task_spec = {
-  "name": "FedAvg2",
+  "name": "FedAvg",
   "image": "v6-average-py",
   "collaboration_id": 1,
   "description": "my task",
@@ -224,29 +221,8 @@ task_spec = {
 
 #v6-fedavg-mnist
 task_spec = {
-  "name": "fedavg-mnist-2",
-  "image": "fedavg-mnist-2",
-  "collaboration_id": 1,
-  "description": "my task",
-   "organizations": [
-
-     {
-        "id": 1,
-        "input": prepared_input
-      },
-      {
-        "id": 2,
-        "input": prepared_input
-      }
-
-  ]
-}
-
-
-#v6-fedavg-mnist
-task_spec = {
-  "name": "fedavg-mnist-5",
-  "image": "fedavg-mnist-5",
+  "name": "mnist",
+  "image": "mnist",
   "collaboration_id": 1,
   "description": "my task",
    "organizations": [
@@ -258,29 +234,12 @@ task_spec = {
 
   ]
 }
-task_spec = {
-  "name": "fedavg-mnist-5",
-  "image": "fedavg-mnist-5",
-  "collaboration_id": 1,
-  "description": "my task",
-   "organizations": [
 
-     {
-        "id": 1,
-        "input": prepared_input
-      },
-      {
-        "id": 2,
-        "input": prepared_input
-      }
-
-  ]
-}
 
 #v6-fedavg-sentiment
 task_spec = {
-  "name": "fedavg-sentiment-2",
-  "image": "fedavg-sentiment-2",
+  "name": "sentiment",
+  "image": "sentiment",
   "collaboration_id": 1,
   "description": "my task",
   "organizations": [
