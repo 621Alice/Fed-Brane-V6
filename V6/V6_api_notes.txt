@@ -146,7 +146,7 @@ json_data =  {
   "method":"master",
   "kwargs": {
     "column_name": ["age","weight"],
-    "ids" : [1,2]
+    "ids" : [1]
   }
 }
 
@@ -165,7 +165,7 @@ json_data =  {
   "master": 1,
   "method":"master",
   "kwargs": {
-    "ids": [1,2],
+    "ids": [1],
     "epoch_per_round":1
   }
 }
@@ -175,7 +175,7 @@ json_data =  {
   "master": 1,
   "method":"master",
   "kwargs": {
-    "ids": [1,2],
+    "ids": [1],
     "epoch_per_round":1
   }
 }
@@ -198,6 +198,10 @@ task_spec = {
   
      {
         "id": 1,
+        "input": prepared_input 
+      },
+      {
+        "id": 2,
         "input": prepared_input 
       }
   ]
@@ -230,6 +234,10 @@ task_spec = {
      {
         "id": 1,
         "input": prepared_input
+      },
+      {
+        "id": 2,
+        "input": prepared_input 
       }
 
   ]
@@ -244,6 +252,10 @@ task_spec = {
   "description": "my task",
   "organizations": [
 
+      {
+        "id": 1,
+        "input": prepared_input 
+      },
       {"id": 2,
       "input": prepared_input
       }
