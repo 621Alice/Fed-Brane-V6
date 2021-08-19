@@ -25,7 +25,7 @@ from sklearn.metrics import accuracy_score
 #split training file for multiple nodes
 #non-iid /iid data? not concerned
 #no local dp (dependencies not match)
-def master(client, data,ids):
+def master(client, data, ids, epoch_per_round):
     """Combine partials to global model
     """
 
@@ -50,7 +50,7 @@ def master(client, data,ids):
                 'parameters': "",
                 'device': device,
                 'return_params': True,
-                'epochs': 1,
+                'epochs': epoch_per_round,
                 'if_test': False
             }
         }, organization_ids=ids
@@ -77,9 +77,6 @@ def master(client, data,ids):
         global_count += len(global_sum)
 
     averaged_parameters = global_sum / global_count
-
-    # in order to not have the optimizer see the new parameters as a non-leaf tensor, .clone().detach() needs
-    # to be applied in order to turn turn "grad_fn=<DivBackward0>" into "grad_fn=True"
     averaged_parameters = [averaged_parameters.clone().detach()]
 
     info('Federated averaging w/ averaged_parameters')
@@ -91,7 +88,7 @@ def master(client, data,ids):
                 'parameters': averaged_parameters,
                 'device': device,
                 'return_params': True,
-                'epochs': 1,
+                'epochs': epoch_per_round,
                 'if_test': True
             }
         },
