@@ -22,6 +22,6 @@ master_task = client.create_new_task(
                 }
 
 
-    }, organization_ids=[0,1])
+    }, organization_ids=[0])
 results = client.get_results(master_task.get("id"))
 print(results)
