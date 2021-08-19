@@ -25,7 +25,7 @@ task = client.post_task(
     name="sentiment-2",
     image="sentiment",
     collaboration_id=1,
-    organization_ids=[1,2],  
+    organization_ids=[1],  
     input_=input_
 )
 
