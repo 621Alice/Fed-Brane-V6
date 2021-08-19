@@ -11,25 +11,26 @@ client = Client(
 client.authenticate("admin", "password")
 client.setup_encryption(None)
 
-# # 2. Prepare input for the summary Docker image (algorithm)
+# # 2. Prepare input for the algorithm
 input_ = {
         "master": "true",
         "method": "master",
         "kwargs":{
-            'ids':2
+            'ids':[1,2],
+            'epoch_per_round':1
         }
         }
 # # 3. post the task to the server post_task
 task = client.post_task(
-    name="sentiment3",
-    image="fedavg-sentiment-2",
+    name="sentiment-2",
+    image="sentiment",
     collaboration_id=1,
-    organization_ids=[2],  # specify where the central container should run! # 4 is the newly created node with the api key that the node config uses
+    organization_ids=[1,2],  
     input_=input_
 )
 
 # # 4. poll if central container is finished
-task_id = task.get("id") #"id"
+task_id = task.get("id") 
 print(f"task id={task_id}")
 
 task = client.request(f"task/{task_id}")
