@@ -34,7 +34,7 @@ python example.py
 <br>
 
 <h4> how to run on real client </h4>
-docker build -t fedavg-mnist-2 .
+docker build -t sentiment .
 <br>
 python client.py
 
