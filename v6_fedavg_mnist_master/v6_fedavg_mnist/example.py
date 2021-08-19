@@ -8,16 +8,17 @@ client = ClientMockProtocol(
     module="v6-fedavg-mnist"
 )
 
-organizations = client.get_organizations_in_my_collaboration()
-org_ids = ids = [organization["id"] for organization in organizations]
-print(org_ids)
-print(type(org_ids))
+# organizations = client.get_organizations_in_my_collaboration()
+# org_ids = ids = [organization["id"] for organization in organizations]
+# print(org_ids)
+# print(type(org_ids))
 master_task = client.create_new_task(
     input_={
                 "master": 1,
                 "method":"master",
                 'kwargs': {
-                    'ids':[0,1]
+                    'ids':[0,1],
+                    'epoch_per_round':1
                 }
 
 
