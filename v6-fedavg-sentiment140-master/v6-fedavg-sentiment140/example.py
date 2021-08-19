@@ -12,7 +12,8 @@ master_task = client.create_new_task(
                 "master": 1,
                 "method":"master",
                 'kwargs': {
-                    'ids':[0,1]
+                    'ids':[0,1],
+                    'epoch_per_round':1
                 }
 
 
