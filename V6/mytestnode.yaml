@@ -1,0 +1,24 @@
+application:
+  api_key: 29945e98-fb62-11eb-82dc-0242ac110003
+  api_path: /api
+  databases:
+    default: /home/leyu/Documents/Brane_vantage6/Data/mnist_train_test_header_2.csv
+  encryption:
+    enabled: false
+    private_key: ''
+  logging:
+    backup_count: 5
+    datefmt: '%Y-%m-%d %H:%M:%S'
+    file: mytestnode.log
+    format: '%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s'
+    level: DEBUG
+    max_size: 1024
+    use_console: true
+  port: '5001'
+  server_url: http://145.100.135.65
+  task_dir: /home/leyu/.local/share/vantage6/node/mytestnode
+environments:
+  acc: {}
+  dev: {}
+  prod: {}
+  test: {}
