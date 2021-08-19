@@ -17,11 +17,15 @@ master_task = client.create_new_task(
                 "master": 1,
                 "method":"master",
                 'kwargs': {
-                    'ids':[0,1],
+                    'ids':[0],
                     'epoch_per_round': 1
                 }
 
 
-    }, organization_ids=[0])
+    }, organization_ids=[0,1])
 results = client.get_results(master_task.get("id"))
-print(results)
+result = 0
+for r in results:
+    print(r)
+    result = result + r
+print('averaging test_acc:', result/len(results))

@@ -16,7 +16,7 @@ input_ = {
         "master": "true",
         "method": "master",
         "kwargs":{
-            'ids':[1,2],
+            'ids':[1],
             'epoch_per_round':1
         }
         }
@@ -24,9 +24,9 @@ input_ = {
 # # 3. post the task to the server post_task
 task = client.post_task(
     name="mnist",
-    image="mnist",
+    image="621leyu/v6-fedpytorch:mnist",
     collaboration_id=1,
-    organization_ids=[1],
+    organization_ids=[1,2],
     input_=input_
 )
 
@@ -44,6 +44,10 @@ while not task.get("complete"):
 results = client.get_results(task_id=task.get("id"))
 
 # e.g. print the results per node
+r = 0
 for result in results:
     print("-"*80)
     print(pickle.loads(result.get("result")))
+    r =r + pickle.loads(result.get("result"))
+
+print('averaging result: ',r/len(results))
