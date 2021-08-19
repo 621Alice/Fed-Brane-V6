@@ -61,7 +61,7 @@ V6-server and v6-node exist as docker images that can be run by starting their c
 
 
 (cd thesis/Brane/V6-server-node-deployment) (cd v6_server)/(cd v6_node)/(cd v6_client) (brane build container.yml) (cd v6_client) (brane build api_spec.yml)
-(brane -d repl --data /home/leyu/Documents/Brane_vantage6/Data)
+(brane -d repl --data /var/lib/docker/volumes/brane_data/_data)
 (**docker container ls -a ; docker logs <id> (for debugging a node))
 (**docker remove <id>(stop the container after running))
 
