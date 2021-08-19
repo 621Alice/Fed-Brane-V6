@@ -39,10 +39,10 @@ print(t);
 
 #post a task, the user who posts a task needs to be in the same collaboration as the task
 #task_input: property name needs to be in single quotes inside the string
-let task_input := "{'master': 1,'method':'master','kwargs': { 'ids' : [1,2] } }";
+let task_input := "{'master': 1,'method':'master','kwargs': { 'ids' : [1,2], 'epoch_per_round':1 } }";
 let prepared_task_input := input_func(task_input);
-let org := [new TaskOrganizations{id := 1, input := prepared_task_input}, new TaskOrganizations{id := 1, input := prepared_task_input}];
-let input := new CreateTaskInput{description := "mnist", collaboration_id := 1, image := "621leyu/v6-fedpytorch:mnist-2", name := "mnist-2", organizations := org};
+let org := [new TaskOrganizations{id := 1, input := prepared_task_input}];
+let input := new CreateTaskInput{description := "mnist", collaboration_id := 1, image := "mnist", name := "mnist-2", organizations := org};
 let task := createtask(input, session.access_token);
 
 #get task result
@@ -154,10 +154,10 @@ print(tasks);
 
 #create task
 import input_conversion;
-let task_input := "{'master': 1, 'method': 'master','kwargs': { 'ids' : [1] } }";
+let task_input := "{'master': 1, 'method': 'master','kwargs': { 'ids' : [1,2], 'epoch_per_round': 1 } }";
 let prepared_task_input := input_func(task_input);
 let org := [new TaskOrganizations{id := 1, input := prepared_task_input}];
-let input := new CreateTaskInput{description := "task", collaboration_id := 1, image := "fedavg-mnist-5", name := "mnist-5", organizations := org};
+let input := new CreateTaskInput{description := "task", collaboration_id := 1, image := "mnist", name := "mnist-2", organizations := org};
 let task := createtask(input, server_url, token);
 
 
