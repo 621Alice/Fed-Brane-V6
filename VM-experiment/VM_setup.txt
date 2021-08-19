@@ -107,7 +107,7 @@ brane build container.yml
 
 #####################
 #install V6
-pip3 install vantage6
+pip3 install git+https://github.com/iknl/vantage6.git@DEV
 export PATH="/home/leyu/.local/bin:$PATH"
 mkdir /home/leyu/.config
 
