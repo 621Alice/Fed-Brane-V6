@@ -26,7 +26,7 @@ task = client.post_task(
     name="mnist",
     image="mnist",
     collaboration_id=1,
-    organization_ids=[1,2],
+    organization_ids=[1],
     input_=input_
 )
 
