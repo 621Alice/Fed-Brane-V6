@@ -113,7 +113,7 @@ def master(client, data, ids, epoch_per_round):
 
 def RPC_train_test(data, model, parameters, device, return_params, epochs, if_test):
     """Compute the average partial
-       Code referenced to https://sofiadutta.github.io/datascience-ipynbs/pytorch/Sentiment-Analysis-using-PyTorch.html
+       Code referenced from https://sofiadutta.github.io/datascience-ipynbs/pytorch/Sentiment-Analysis-using-PyTorch.html
     """
     # nltk.download('punkt')
     # nltk.download('stopwords')
