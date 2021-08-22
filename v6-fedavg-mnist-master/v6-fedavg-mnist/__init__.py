@@ -211,6 +211,9 @@ def RPC_train_test(data, model, parameters, device, log_interval, return_params,
 
 
 class Net(nn.Module):
+    '''
+    Model refrenced from Carlijn https://github.com/Supercarlijn/ppsdg
+    '''
     def __init__(self):
         super(Net, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 3, 1)
