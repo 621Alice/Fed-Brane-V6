@@ -2,7 +2,7 @@ application:
   api_key: 29945e98-fb62-11eb-82dc-0242ac110003
   api_path: /api
   databases:
-    default: /home/leyu/Documents/Brane_vantage6/Data/sentiment_train_test_header_2.csv
+    default: /home/leyu/Documents/Brane_vantage6/Data/sentiment_train_test_header_1.csv
   encryption:
     enabled: false
     private_key: ''
