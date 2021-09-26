@@ -11,7 +11,7 @@ environments:
     logging:
       backup_count: 5
       datefmt: '%Y-%m-%d %H:%M:%S'
-      file: myv6.log
+      file: server.log
       format: '%(asctime)s - %(name)-14s - %(levelname)-8s - %(message)s'
       level: DEBUG
       max_size: 1024
